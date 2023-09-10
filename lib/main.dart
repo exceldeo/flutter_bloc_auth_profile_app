@@ -1,37 +1,46 @@
+import 'dart:io';
+
+import 'package:my_profile_app/core/base/service/auth_service.dart';
+import 'package:my_profile_app/core/constants/app/string_constants.dart';
+import 'package:my_profile_app/core/init/cache/auth_cache_manager.dart';
+import 'package:my_profile_app/core/init/network/dio_manager.dart';
+import 'package:my_profile_app/view/auth/splash_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_profile_app/blocs/authentication/authentication_bloc.dart';
-import 'package:my_profile_app/blocs/profile/profile_bloc.dart';
-import 'package:my_profile_app/presentation/router.dart';
-import 'package:my_profile_app/presentation/screens/home/home_page.dart';
+
+import 'core/base/bloc/auth_bloc.dart';
 
 void main() {
-  runApp(MyApp(
-    router: AppRouter(),
-  ));
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(
+    BlocProvider<AuthBloc>(
+      create: (_) => AuthBloc(
+        AuthService(DioManager.instance),
+        AuthCacheManager(),
+      ),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final AppRouter router;
-
-  const MyApp({Key? key, required this.router}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthenticationBloc>(
-          create: (context) => AuthenticationBloc(),
-        ),
-        BlocProvider<ProfileBloc>(
-          create: (context) => ProfileBloc(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: router.generateRoute,
-        initialRoute: HomePage.routeName,
-      ),
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: StringConstants.appName,
+      home: SplashView(),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
