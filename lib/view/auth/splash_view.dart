@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:my_profile_app/core/constants/enums/icon_enums.dart';
 import 'package:my_profile_app/core/extensions/context_extensions.dart';
 import 'package:my_profile_app/core/extensions/image_extensions.dart';
-import 'package:my_profile_app/core/init/cache/auth_cache_manager.dart';
+import 'package:my_profile_app/core/extensions/navigate_extension.dart';
 import 'package:my_profile_app/core/utils/navigate_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:my_profile_app/core/base/auth/bloc/auth_bloc.dart';
+import '../../core/base/bloc/auth_bloc.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -21,7 +21,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   late final AuthBloc authBloc;
   late StreamSubscription authStream;
   late AnimationController _controller;
-  late bool isLogin;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -33,28 +33,25 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
 
     authStream = authBloc.stream.listen((state) {
-      Future.delayed(const Duration(seconds: 2))
-          .then((_) => AuthCacheManager().isLoggedIn().then((value) {
-                isLogin = value;
-                if (isLogin) {
-                  NavigateUtil().navigatePageClear(context, '/');
-                } else {
-                  NavigateUtil().navigatePageClear(context, '/login');
-                }
-              }));
+      Future.delayed(const Duration(seconds: 2)).then((_) =>
+          NavigateUtil().navigateToView(context, state.status.firstView));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset(
-          IconEnums.appLogo.iconName.toPng,
-          height: context.dynamicHeight(0.2),
-          width: context.dynamicWidth(0.9),
+      body: RotationTransition(
+        turns: _animation,
+        child: Center(
+          child: Image.asset(
+            IconEnums.appLogo.iconName.toPng,
+            height: context.dynamicHeight(0.2),
+            width: context.dynamicWidth(0.9),
+          ),
         ),
       ),
     );

@@ -1,19 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DioManager {
   static DioManager? _instance;
 
   static DioManager get instance {
     if (_instance != null) return _instance!;
-    _instance = DioManager();
+    _instance = DioManager._init();
     return _instance!;
   }
 
-  final String _baseUrl = dotenv.env['CLIENT_URL']!;
+  final String _baseUrl = 'https://e85e-118-99-107-197.ngrok-free.app/';
   late final Dio dio;
 
-  DioManager() {
+  DioManager._init() {
     dio = Dio(
       BaseOptions(
         baseUrl: _baseUrl,

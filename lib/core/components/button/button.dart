@@ -9,34 +9,31 @@ class CustomButton extends StatelessWidget {
     super.key,
     required this.buttonText,
     required this.onTap,
-    this.isDisabled = false,
   });
 
   final String buttonText;
   final VoidCallback onTap;
-  final bool isDisabled;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: context.dynamicHeight(0.05)),
       child: ElevatedButton(
-        onPressed: isDisabled ? null : onTap,
+        onPressed: onTap,
         style: ElevatedButton.styleFrom(
-            backgroundColor:
-                isDisabled ? Colors.grey : ColorConstants.secondary,
+            backgroundColor: ColorConstants.teal,
             fixedSize: Size(
               context.dynamicWidth(1),
               context.dynamicHeight(0.06),
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(9),
+              borderRadius: BorderRadius.circular(15),
             )),
         child: CustomText(
           buttonText,
-          textStyle: context.textTheme.bodyMedium?.copyWith(
+          textStyle: context.textTheme.titleLarge?.copyWith(
             color: Colors.white,
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
+import 'package:my_profile_app/core/components/appbar/appbar.dart';
+import 'package:my_profile_app/core/components/text/custom_text.dart';
 import 'package:my_profile_app/core/components/textFormField/text_form_field.dart';
 import 'package:my_profile_app/core/constants/app/string_constants.dart';
+import 'package:my_profile_app/core/constants/enums/icon_enums.dart';
 import 'package:my_profile_app/core/extensions/context_extensions.dart';
+import 'package:my_profile_app/core/extensions/image_extensions.dart';
+import 'package:my_profile_app/core/extensions/num_extensions.dart';
 import 'package:my_profile_app/core/utils/validate_operations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:my_profile_app/core/base/auth/bloc/auth_bloc.dart';
-import 'package:my_profile_app/core/components/button/button.dart';
-
-import 'package:my_profile_app/core/constants/enums/auth_enums.dart';
+import '../../core/base/bloc/auth_bloc.dart';
+import '../../core/components/button/button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -25,98 +28,35 @@ class _LoginViewState extends State<LoginView> {
 
   bool? get validate => _formKey.currentState?.validate();
 
-  Function checkValidate() {
-    setState(() {});
-    return () {};
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (BuildContext context, state) {
-        // Check here if the state is unathenticated
-        if (state.status == AuthStatus.authenticated) {
-          // Navigate to login page
-          Navigator.pushReplacementNamed(context, '/');
-        }
-        if (state.error != null) {
-          const snackBar = SnackBar(
-            content: Text(
-              "Email or password is wrong!",
-            ),
-          );
-
-          // Find the ScaffoldMessenger in the widget tree
-          // and use it to show a SnackBar.
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          emailController.clear();
-          passwordController.clear();
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: SizedBox(
-            height: context.dynamicHeight(1),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.dynamicWidth(0.05),
-              ),
-              child: Center(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Login",
-                          style: context.textTheme.headlineMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          )),
-                      _EmailFormField(emailController: emailController),
-                      _PasswordFormField(
-                          passwordController: passwordController),
-                      _LoginButton(
-                        isDisabled: !true,
-                        onTap: () async {
-                          if (validate != null && validate == true) {
-                            context.read<AuthBloc>().add(LoginRequested(
-                                  emailController.text.trim(),
-                                  passwordController.text.trim(),
-                                ));
-                          }
-                        },
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("No account?",
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                )),
-                            SizedBox(
-                              width: context.dynamicWidth(0.02),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/register');
-                              },
-                              child: Text(
-                                "Register",
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.yellow,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+    return Scaffold(
+      appBar: CustomAppBar(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.dynamicWidth(0.05),
+          ),
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const _LogoAndTitleWidget(),
+                  _EmailFormField(emailController: emailController),
+                  _PasswordFormField(passwordController: passwordController),
+                  _LoginButton(
+                    onTap: () {
+                      if (validate != null && validate == true) {
+                        context.read<AuthBloc>().add(LoginRequested(
+                              emailController.text.trim(),
+                              passwordController.text.trim(),
+                            ));
+                      }
+                    },
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -125,11 +65,32 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
-// Get the current state of the AuthBloc
 
-// Check if the current state is an AuthState with an error
+class _LogoAndTitleWidget extends StatelessWidget {
+  const _LogoAndTitleWidget();
 
-// Continue with the rest of your code...
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: context.dynamicHeight(0.06),
+      ),
+      child: Column(
+        children: [
+          Image.asset(
+            IconEnums.appLogo.iconName.toPng,
+            height: context.dynamicHeight(0.2),
+          ),
+          30.ph,
+          CustomText(
+            StringConstants.loginTitle,
+            textStyle: context.textTheme.titleMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _EmailFormField extends StatelessWidget {
   const _EmailFormField({
@@ -142,19 +103,18 @@ class _EmailFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormFieldWidget(
       controller: emailController,
+      title: StringConstants.emailTitle,
       hintText: StringConstants.emailHint,
       keyboardType: TextInputType.emailAddress,
       onSaved: (value) {
         emailController.text = value!;
       },
-      validator: (value) =>
-          ValidateOperations.emailValidation(value) ??
-          ValidateOperations.normalValidation(value),
+      validator: (value) => ValidateOperations.emailValidation(value),
     );
   }
 }
 
-class _PasswordFormField extends StatefulWidget {
+class _PasswordFormField extends StatelessWidget {
   const _PasswordFormField({
     required this.passwordController,
   });
@@ -162,60 +122,30 @@ class _PasswordFormField extends StatefulWidget {
   final TextEditingController passwordController;
 
   @override
-  _PasswordFormFieldState createState() => _PasswordFormFieldState();
-}
-
-class _PasswordFormFieldState extends State<_PasswordFormField> {
-  bool isPasswordVisible = false;
-
-  void togglePasswordVisibility() {
-    setState(() {
-      isPasswordVisible = !isPasswordVisible;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return TextFormFieldWidget(
-      controller: widget.passwordController,
+      controller: passwordController,
+      title: StringConstants.passwordTitle,
       hintText: StringConstants.passwordHint,
-      isPassword: !isPasswordVisible,
-      suffixIcon: IconButton(
-        icon: Icon(
-          isPasswordVisible
-              ? Icons.visibility_rounded
-              : Icons.visibility_off_rounded,
-          color: Colors.grey,
-        ),
-        onPressed: () {
-          togglePasswordVisibility();
-        },
-      ),
+      isPassword: true,
       onSaved: (value) {
-        widget.passwordController.text = value!;
+        passwordController.text = value!;
       },
       validator: (value) => ValidateOperations.normalValidation(value),
     );
   }
 }
 
-class _LoginButton extends StatefulWidget {
-  const _LoginButton({required this.onTap, required this.isDisabled});
+class _LoginButton extends StatelessWidget {
+  const _LoginButton({required this.onTap});
 
   final VoidCallback onTap;
-  final bool isDisabled;
 
-  @override
-  _LoginButtonState createState() => _LoginButtonState();
-}
-
-class _LoginButtonState extends State<_LoginButton> {
   @override
   Widget build(BuildContext context) {
     return CustomButton(
       buttonText: StringConstants.loginButtonText,
-      onTap: widget.onTap,
-      isDisabled: widget.isDisabled,
+      onTap: onTap,
     );
   }
 }

@@ -7,8 +7,4 @@ class NavigateUtil {
       MaterialPageRoute(builder: (context) => route),
     );
   }
-
-  void navigatePageClear(BuildContext context, String route) {
-    Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
-  }
 }
