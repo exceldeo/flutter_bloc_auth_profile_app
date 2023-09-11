@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 extension ContextExtension on BuildContext {
   MediaQueryData get mediaQuery => MediaQuery.of(this);
   TextTheme get textTheme => Theme.of(this).textTheme;
+  void forceRefresh(VoidCallback callback) {
+    // Implement the logic to force refresh the context here
+    // For example, you can use the provided callback to trigger a rebuild
+    callback();
+  }
 }
 
 extension MediaQueryExtension on BuildContext {

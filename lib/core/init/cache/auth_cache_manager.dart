@@ -24,11 +24,21 @@ class AuthCacheManager {
     await CacheManager.setBool(NetworkEnums.login.path, isLoggedIn);
   }
 
+  Future<void> updateUsername(String? username) async {
+    if (username != null) {
+      await CacheManager.setString(NetworkEnums.username.path, username);
+    } else {
+      if (await CacheManager.containsKey(NetworkEnums.username.path)) {
+        await CacheManager.remove(NetworkEnums.username.path);
+      }
+    }
+  }
+
   Future<void> updateToken(String? token) async {
     if (token != null) {
       await CacheManager.setString(NetworkEnums.token.path, token);
       DioManager.instance.dio.options
-          .headers[(MapEntry('Authorization', 'token $token'))];
+          .headers[(MapEntry('Authorization', 'bearer $token'))];
 
       /// Actually, we will not need it for this application.
       /// But I've included it here for instructive purposes.
@@ -45,7 +55,7 @@ class AuthCacheManager {
       final token = await CacheManager.getString(NetworkEnums.token.path);
       if (token != null) {
         DioManager.instance.dio.options
-            .headers[(MapEntry('Authorization', 'token $token'))];
+            .headers[(MapEntry('Authorization', 'bearer $token'))];
 
         /// Actually, we will not need it for this application.
         /// But I've included it here for instructive purposes.

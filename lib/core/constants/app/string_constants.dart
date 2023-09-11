@@ -9,8 +9,11 @@ class StringConstants {
   /// for Login view
   static const String loginTitle = "You can log in with your information.";
   static const String loginButtonText = "LOGIN";
+  static const String registerButtonText = "REGISTER";
+  static const String logoutButtonText = "LOGOUT";
   static const String emailTitle = "Email";
   static const String passwordTitle = "Password";
+  static const String usernameHint = 'Username';
   static const String emailHint = 'example@gmail.com';
   static const String passwordHint = '···········';
 
