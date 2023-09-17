@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_profile_app/core/components/layout/card/card.dart';
 import 'package:my_profile_app/core/components/textFormField/text_form_field_style_two.dart';
 import 'package:my_profile_app/core/constants/app/color_constants.dart';
 import 'package:my_profile_app/core/extensions/context_extensions.dart';
@@ -102,23 +103,20 @@ class _FormAddInterestState extends State<_FormAddInterest> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Tell everyone about yourself",
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: ColorConstants.gold.withOpacity(0.8),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          "What Interest you?",
-          style: context.textTheme.headlineMedium?.copyWith(
+          "What do you do for work?",
+          style: context.textTheme.headlineSmall?.copyWith(
             color: ColorConstants.white.withOpacity(0.8),
             fontWeight: FontWeight.bold,
           ),
         ),
-        10.ph,
-        SizedBox(
+        30.ph,
+        Container(
           width: context.dynamicWidth(0.9),
-          height: context.dynamicHeight(0.06),
+          height: context.dynamicHeight(0.07),
+          decoration: BoxDecoration(
+            color: ColorConstants.glassMorphismWhite.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(6),
+          ),
           child: TextFormField(
               textAlign: TextAlign.left,
               controller: _textEditingController,
@@ -130,15 +128,33 @@ class _FormAddInterestState extends State<_FormAddInterest> {
                 });
               },
               decoration: InputDecoration(
-                fillColor: ColorConstants.glassMorphismWhite,
-                hintText: "Add Interest",
-                hintStyle: context.textTheme.bodySmall?.copyWith(
-                  color: ColorConstants.white.withOpacity(0.3),
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: context.dynamicWidth(0.02),
+                    vertical: context.dynamicHeight(0.025)),
+                hintText: "eg. Musician",
+                hintStyle: context.textTheme.bodyLarge?.copyWith(
+                  color: ColorConstants.white.withOpacity(0.1),
+                  fontWeight: FontWeight.bold,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                   borderSide: const BorderSide(
                     color: ColorConstants.white,
+                    width: 4,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  // border transparent
+                  borderSide: const BorderSide(
+                    color: Colors.transparent,
+                    width: 4,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: const BorderSide(
+                    color: Colors.transparent,
                     width: 4,
                   ),
                 ),
@@ -149,12 +165,34 @@ class _FormAddInterestState extends State<_FormAddInterest> {
                 fontWeight: FontWeight.w700,
               )),
         ),
-        10.ph,
+        20.ph,
+        Text(
+          "Selected Profession",
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: ColorConstants.white.withOpacity(0.3),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         _ListOfInterest(
           interests: _interests,
           onDelete: (value) {
             setState(() {
               _interests.remove(value);
+            });
+          },
+        ),
+        20.ph,
+        Text(
+          "Popular Profession",
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: ColorConstants.white.withOpacity(0.3),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        _ListOfPopularInterest(
+          onAdd: (value) {
+            setState(() {
+              _interests.add(value);
             });
           },
         ),
@@ -178,36 +216,107 @@ class _ListOfInterest extends StatelessWidget {
                     horizontal: context.dynamicWidth(0.01),
                     vertical: context.dynamicHeight(0.01)),
                 padding: EdgeInsets.symmetric(
-                    horizontal: context.dynamicWidth(0.02)),
+                    horizontal: context.dynamicWidth(0.02),
+                    vertical: context.dynamicHeight(0.01)),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: ColorConstants.white.withOpacity(0.3),
-                  ),
+                  borderRadius: BorderRadius.circular(3),
+                  color: ColorConstants.glassMorphismWhite.withOpacity(0.3),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       e,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: ColorConstants.white.withOpacity(0.8),
-                        fontWeight: FontWeight.bold,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: ColorConstants.white,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    IconButton(
-                        onPressed: () {
+                    InkWell(
+                        onTap: () {
                           onDelete?.call(e);
                         },
-                        icon: Icon(
+                        child: Icon(
                           Icons.close,
                           color: ColorConstants.white.withOpacity(0.8),
-                          size: 15,
+                          size: 22,
                         ))
                   ],
                 ),
               ))
           .toList(),
+    );
+  }
+}
+
+class _ListOfPopularInterest extends StatelessWidget {
+  const _ListOfPopularInterest({super.key, this.onAdd});
+
+  final void Function(String)? onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: [
+        _InterestCard(
+          title: "Musician",
+          onAdd: onAdd,
+        ),
+        _InterestCard(
+          title: "Photographer",
+          onAdd: onAdd,
+        ),
+        _InterestCard(
+          title: "Designer",
+          onAdd: onAdd,
+        ),
+        _InterestCard(
+          title: "Developer",
+          onAdd: onAdd,
+        ),
+      ],
+    );
+  }
+}
+
+class _InterestCard extends StatelessWidget {
+  const _InterestCard({super.key, required this.title, this.onAdd});
+
+  final String title;
+  final void Function(String)? onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        onAdd?.call(title);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(
+            horizontal: context.dynamicWidth(0.01),
+            vertical: context.dynamicHeight(0.01)),
+        padding: EdgeInsets.symmetric(
+            horizontal: context.dynamicWidth(0.02),
+            vertical: context.dynamicHeight(0.01)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: ColorConstants.glassMorphismWhite.withOpacity(0.1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: ColorConstants.white.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
