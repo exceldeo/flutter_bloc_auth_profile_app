@@ -3,6 +3,8 @@ import 'package:my_profile_app/core/base/profile/bloc/profile_bloc.dart';
 import 'package:my_profile_app/core/base/profile/model/profile_model.dart';
 import 'package:my_profile_app/core/components/appbar/appbar.dart';
 import 'package:my_profile_app/core/components/button/button.dart';
+import 'package:my_profile_app/core/components/datepicker/datepickerField.dart';
+import 'package:my_profile_app/core/components/dropdown/dropdown_field.dart';
 import 'package:my_profile_app/core/components/layout/card/card.dart';
 import 'package:my_profile_app/core/components/text/custom_text.dart';
 import 'package:my_profile_app/core/components/textFormField/text_form_field_style_two.dart';
@@ -337,26 +339,22 @@ class __AboutFormSectionState extends State<_AboutFormSection> {
               validator: (value) => ValidateOperations.normalValidation(value),
             ),
             8.ph,
-            TextFormFieldWidgetStyleTwo(
-              controller: genderController,
-              hintText: "Select Gender",
-              keyboardType: TextInputType.name,
-              onSaved: (value) {
+            DropdownMenuField(
+              data: [
+                {"label": "Male", "value": "male"},
+                {"label": "Female", "value": "female"},
+              ],
+              initialSelection: "male",
+              onSelected: (value) {
                 genderController.text = value!;
               },
-              title: "Gender:",
-              validator: (value) => ValidateOperations.normalValidation(value),
             ),
             8.ph,
-            TextFormFieldWidgetStyleTwo(
-              controller: birthDateController,
-              hintText: "Select Birth Date",
-              keyboardType: TextInputType.name,
-              onSaved: (value) {
-                birthDateController.text = value!;
+            DatePickerField(
+              initialDate: DateTime.now(),
+              selectedDate: (DateTime? date) {
+                birthDateController.text = date.toString();
               },
-              title: "Birth Date:",
-              validator: (value) => ValidateOperations.normalValidation(value),
             ),
             8.ph,
             TextFormFieldWidgetStyleTwo(

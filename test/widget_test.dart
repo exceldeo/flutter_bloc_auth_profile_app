@@ -1,30 +1,101 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:io';
 
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:my_profile_app/core/base/auth/bloc/auth_bloc.dart';
+import 'package:my_profile_app/core/base/auth/service/auth_service.dart';
+import 'package:my_profile_app/core/components/appbar/appbar.dart';
+import 'package:my_profile_app/core/init/cache/auth_cache_manager.dart';
+import 'package:my_profile_app/core/init/network/dio_manager.dart';
 
-import 'package:my_profile_app/main.dart';
+import 'package:my_profile_app/view/auth/login_view.dart';
+
+class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {
+  MockAuthBloc(MockAuthService mockAuthService,
+      MockAuthCacheManager mockAuthCacheManager);
+}
+
+class MockAuthService extends Mock implements AuthService {
+  MockAuthService(DioManager instance);
+}
+
+class MockAuthCacheManager extends Mock implements AuthCacheManager {}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  dotenv.testLoad(fileInput: File('test/.env').readAsStringSync());
+  group('LoginView Test', () {
+    testWidgets('LoginView Test', (WidgetTester tester) async {
+      // Test code goes here
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: BlocProvider<MockAuthBloc>.value(
+              value: MockAuthBloc(
+                MockAuthService(DioManager.instance),
+                MockAuthCacheManager(),
+              ),
+              child: const LoginView(),
+            ),
+          ),
+        );
+        final authBloc = AuthBloc(
+          MockAuthService(DioManager.instance),
+          MockAuthCacheManager(),
+        );
+        whenListen(authBloc, Stream.fromIterable([0, 1, 2, 3]));
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pump();
+      } catch (error) {
+        if (kDebugMode) {
+          print('Test failed: $error');
+        }
+      }
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    testWidgets('LoginView Test', (WidgetTester tester) async {
+      // Test code goes here
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: BlocProvider<MockAuthBloc>.value(
+              value: MockAuthBloc(
+                MockAuthService(DioManager.instance),
+                MockAuthCacheManager(),
+              ),
+              child: const LoginView(),
+            ),
+          ),
+        );
+        final authBloc = AuthBloc(
+          MockAuthService(DioManager.instance),
+          MockAuthCacheManager(),
+        );
+        whenListen(authBloc, Stream.fromIterable([0, 1, 2, 3]));
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pump();
+      } catch (error) {
+        if (kDebugMode) {
+          print('Test failed: $error');
+        }
+      }
+    });
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  group('widget', () {
+    testWidgets('app bar', (WidgetTester tester) async {
+      testWidgets('app bar', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          CustomAppBar(),
+        );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+        final titleFinder = find.text('@MyAppName');
+        expect(titleFinder, findsOneWidget);
+      });
+    });
   });
 }

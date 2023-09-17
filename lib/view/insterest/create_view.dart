@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:my_profile_app/core/components/textFormField/text_form_field_style_two.dart';
 import 'package:my_profile_app/core/constants/app/color_constants.dart';
 import 'package:my_profile_app/core/extensions/context_extensions.dart';
@@ -92,6 +93,8 @@ class _FormAddInterest extends StatefulWidget {
 class _FormAddInterestState extends State<_FormAddInterest> {
   final TextEditingController _textEditingController = TextEditingController();
 
+  final List<String> _interests = [];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -113,16 +116,98 @@ class _FormAddInterestState extends State<_FormAddInterest> {
           ),
         ),
         10.ph,
-        TextFormFieldWidgetStyleTwo(
-          controller: _textEditingController,
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "Please enter your interest";
-            }
-            return null;
+        SizedBox(
+          width: context.dynamicWidth(0.9),
+          height: context.dynamicHeight(0.06),
+          child: TextFormField(
+              textAlign: TextAlign.left,
+              controller: _textEditingController,
+              keyboardType: TextInputType.text,
+              onFieldSubmitted: (value) {
+                setState(() {
+                  _interests.add(value);
+                  _textEditingController.clear();
+                });
+              },
+              decoration: InputDecoration(
+                fillColor: ColorConstants.glassMorphismWhite,
+                hintText: "Add Interest",
+                hintStyle: context.textTheme.bodySmall?.copyWith(
+                  color: ColorConstants.white.withOpacity(0.3),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: const BorderSide(
+                    color: ColorConstants.white,
+                    width: 4,
+                  ),
+                ),
+              ),
+              cursorColor: ColorConstants.teal,
+              style: GoogleFonts.montserrat().copyWith(
+                color: ColorConstants.white,
+                fontWeight: FontWeight.w700,
+              )),
+        ),
+        10.ph,
+        _ListOfInterest(
+          interests: _interests,
+          onDelete: (value) {
+            setState(() {
+              _interests.remove(value);
+            });
           },
-        )
+        ),
       ],
+    );
+  }
+}
+
+class _ListOfInterest extends StatelessWidget {
+  const _ListOfInterest({super.key, required this.interests, this.onDelete});
+
+  final List<String> interests;
+  final void Function(String)? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: interests
+          .map((e) => Container(
+                margin: EdgeInsets.symmetric(
+                    horizontal: context.dynamicWidth(0.01),
+                    vertical: context.dynamicHeight(0.01)),
+                padding: EdgeInsets.symmetric(
+                    horizontal: context.dynamicWidth(0.02)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: ColorConstants.white.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      e,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: ColorConstants.white.withOpacity(0.8),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          onDelete?.call(e);
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: ColorConstants.white.withOpacity(0.8),
+                          size: 15,
+                        ))
+                  ],
+                ),
+              ))
+          .toList(),
     );
   }
 }
